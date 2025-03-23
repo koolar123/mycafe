@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Restaurant Menu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .menu-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .menu-photo {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transform-origin: center;
+            cursor: pointer;
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.5s ease;
+        }
+
+        .menu-photo.clicked {
+            transform: scale(3);
+            opacity: 0;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            z-index: 1000;
+        }
+
+        .popup {
+            font-family: 'Dutch', sans-serif;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1001;
+            max-width: 400px;
+            width: 90%;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            opacity: 0;
+        }
+        .popup-content h2,
+        .popup-content p {
+            font-family: inherit;
+        }
+        .popup-content {
+            text-align: center;
+        }
+
+        .popup-img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .show-popup {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container" id="fullscreen-container">
+        <img src="Picture3 (1).png" alt="Restaurant Menu" class="menu-photo" id="menuImage" usemap="#image-map">
+    </div>
+
+    <map name="image-map">
+        <area alt="chai" title="chai" href="javascript:void(0)" 
+              coords="177,158,200,163,204,188,200,232,163,230,155,169" shape="poly"
+              onclick="showPopup(event, 'chai')">
+        <area alt="muffan" title="muffan" href="javascript:void(0)" 
+              coords="364,273,334,302,354,331,400,351,460,351,483,330,476,295,447,253" shape="poly"
+              onclick="showPopup(event, 'muffan')">
+        <area alt="bun" title="bun" href="javascript:void(0)" 
+              coords="272,205,302,212,319,231,342,240,343,256,337,264,338,280,314,298,281,305,247,300,217,288,206,262,224,240,249,211,262,209" shape="poly"
+              onclick="showPopup(event, 'bun')">
+    </map>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <span class="close-btn" onclick="closePopup()">×</span>
+        <div class="popup-content">
+            <img id="popup-img" src="" alt="" class="popup-img">
+            <div id="popup-text" class="popup-text"></div>
+        </div>
+    </div>
+
+    <script>
+        function showPopup(event, item) {
+            event.stopPropagation();
+            const content = {
+                chai: {
+                    img: "chai sticker.png",
+                    text:  `
+                <h2>Chai - The Timeless Classic</h2>
+<h3>Strengths</h3>
+<p>Great beverage</p>
+<p>Quintessential with Bun Maska – they are like inseparable brothers</p>
+
+<h3>Weakness</h3>
+<p>There are none, it's a historical GOATed item, tried and tested in all cultures, always works 🏆</p>
+
+            `,small: true
+             },
+                muffan: {
+                    img: "muffin sticker.png",
+                    text: "<p>An NRI aunty at an Indian wedding—stealing the spotlight, yet the most basic baked item on the menu. Why is this even here?</p>",
+                },
+                bun: {
+                    img: "pav sticker[1].png",
+                    text: "A soft and fresh bun, perfect with tea.",
+                }
+            };
+            
+            if (content[item]) {
+                document.getElementById('popup-img').src = content[item].img;
+                document.getElementById('popup-text').innerHTML = content[item].text;
+                document.getElementById('overlay').style.display = 'block';
+                document.getElementById('popup').style.display = 'block';
+                setTimeout(() => document.getElementById('popup').classList.add('show-popup'), 10);
+            }
+        }
+
+        function closePopup() {
+            document.getElementById('popup').classList.remove('show-popup');
+            setTimeout(() => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('popup').style.display = 'none';
+            }, 300);
+        }
+
+        document.getElementById('overlay').addEventListener('click', closePopup);
+        document.getElementById('menuImage').addEventListener('click', function(event) {
+            if (!event.target.closest("area")) {
+                this.classList.add("clicked");
+                setTimeout(() => window.location.href = "sweet.html", 1500);
+            }
+        });
+    </script>
+</body>
+</html>

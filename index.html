@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koolar & Co - Animated Transition</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .responsive-container {
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+            overflow: hidden;
+        }
+        .main-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.5s ease;
+        }
+        .zoom-active {
+            transform: scale(4);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="responsive-container">
+        <img src="KOOLARS FRONT.png" 
+             alt="Restaurant Main Banner"
+             class="main-image"
+             usemap="#main-map">
+
+        <map name="main-map">
+            <area shape="poly" 
+                  coords="603,865,615,898,555,901,537,892,536,865,553,854,552,833,563,819,580,822,586,838,586,852"
+                  href="special-offer.html"
+                  alt="Special Offer"
+                  title="Click to view special offer"
+                  class="clickable-area">
+        </map>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-rwdImageMaps/1.6/jquery.rwdImageMaps.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('img[usemap]').rwdImageMaps();
+
+            $('.clickable-area').on('click', function(e) {
+                e.preventDefault();
+                const mainImage = $('.main-image');
+                const targetUrl = $(this).attr('href');
+                
+                // Calculate click position coordinates
+                const imgOffset = mainImage.offset();
+                const clickX = e.pageX - imgOffset.left;
+                const clickY = e.pageY - imgOffset.top;
+                
+                // Set transform origin to clicked position
+                mainImage.css({
+                    'transform-origin': `${clickX}px ${clickY}px`,
+                    'z-index': 2
+                });
+
+                // Start animation and redirect
+                mainImage.addClass('zoom-active');
+                setTimeout(() => {
+                    window.location.href = targetUrl;
+                }, 1500); // Match animation duration (1.5s)
+            });
+        });
+    </script>
+</body>
+</html>

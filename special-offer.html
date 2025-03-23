@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Full Screen Image Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: manipulation;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .fullscreen-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        area {
+    color: red !important;
+}
+        .fullscreen-image {
+            object-fit: contain;
+            transition: transform 0.8s ease, opacity 0.8s ease;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            z-index: 1000;
+        }
+        
+
+        .popup {
+            font-family: 'Dutch', sans-serif;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1001;
+            max-width: 400px;
+            width: 90%;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            opacity: 0;
+        }
+
+        .popup-content {
+            text-align: center;
+        }
+        .popup-content h2,
+.popup-content p {
+    font-family: inherit;
+}
+        .popup-img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .show-popup {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        .popup-img.small {
+    max-width: 100px; /* Adjust size as needed */
+    max-height: 200px;
+    }
+    .popup-img.large {
+    max-width: 200px; /* Adjust size as needed */
+    max-height: 300px;
+    }
+    </style>
+</head>
+<body>
+    <div class="fullscreen-container">
+        <img src="graphics table scene.png" 
+             alt="Full Screen Display"
+             class="fullscreen-image"
+             id="mainImage"
+             usemap="#image-map">
+    </div>
+
+    <map name="image-map">
+        <area alt="Table" title="Table" href="menu.html" 
+              coords="535,610,627,617,617,583,671,586,711,620,783,627,815,743,598,744,427,744,407,685,359,692" shape="poly"
+              onclick="handleTableClick(event)">
+              
+        <area alt="Bun" title="Bun" href="javascript:void(0)" 
+              coords="345,540,337,551,344,562,356,567,369,569,385,569,402,563,409,551,394,536,366,533" shape="poly"
+              onclick="showPopup('bun')">
+
+        <area alt="Cola" title="Cola" href="javascript:void(0)" 
+              coords="1016,508,1028,507,1028,523,1032,535,1034,550,1033,571,1034,597,1010,598,1011,544,1017,528" shape="poly"
+              onclick="showPopup('cola')">
+        <area alt="khari" title="khari" href="javascript:void(0)" 
+              coords="317,356,331,357,360,372,360,388,320,391,263,391,265,381,301,368" shape="poly"
+              onclick="showPopup('khari')">
+        <area alt="sign" title="sign" href="javascript:void(0)" 
+              coords="147,363,191,360,190,424,150,425" shape="poly"
+              onclick="showPopup('sign')">
+        <area alt="nosmoking" title="nosmoking" href="javascript:void(0)" 
+              coords="858,204,899,194,957,201,961,310,951,315,953,391,935,403,929,416,930,433,920,448,919,455,862,457,869,321,857,324" shape="poly"
+              onclick="showPopup('nosmoking')">
+    </map>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <span class="close-btn" onclick="closePopup()">×</span>
+        <div class="popup-content">
+            <img id="popup-img" src="" alt="" class="popup-img">
+            <div id="popup-text" class="popup-text"></div>
+        </div>
+    </div>
+
+    <script>
+        const image = document.getElementById('mainImage');
+        const overlay = document.getElementById('overlay');
+        const popup = document.getElementById('popup');
+        const popupImg = document.getElementById('popup-img');
+        const popupText = document.getElementById('popup-text');
+
+        function handleTableClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    // Create smooth zoom effect
+    image.style.transition = "transform 0.8s ease-in-out, opacity 0.5s ease-in-out";
+    image.style.transform = "scale(1.2)";
+    image.style.opacity = "0";
+
+    setTimeout(() => {
+        window.location.href = 'menu.html';
+    }, 800); // Matches the transition duration
+}
+
+        function adjustImageMap() {
+            const originalWidth = 800;
+            const scaleFactor = image.clientWidth / originalWidth;
+            document.querySelectorAll("area").forEach(area => {
+                let newCoords = area.dataset.coords.split(',').map(coord => Math.round(coord * scaleFactor));
+                area.coords = newCoords.join(',');
+            });
+        }
+
+        window.addEventListener("resize", adjustImageMap);
+        window.addEventListener("load", adjustImageMap);
+
+        function showPopup(item) {
+    let content = {
+        bun: {
+            img: "bun maska stickerr[1].png",
+            text: `<h2>Artisanal Masala Bun</h2>
+                   <p>An upgraded version with cheese and honey filling.</p>
+                   <p>A patent order which can never go wrong.</p>
+                   <p>A palate cleanser among all the other atrocities that we ordered and experimented with.</p>
+                   <p>Just a bun maska after all, nothing special.</p>`,
+            small: false
+        },
+        cola: {
+            img: "ezgif-85447e8d3be0c6.gif",
+            text: `<h2>Coca-Cola </h2>
+                   <p>The unconventional water</p>`,
+            small: true  // Cola bottle should be smaller
+        },
+        banana: {
+            img: "Sigle_Banana.gif",
+            text: `<h2>Artisanal Masala Bun</h2>
+                   <p>The unexpected protagonist of every café visit.</p>
+                   <p>More reliable than the menu—it’s always there.</p>
+                   <p>Nobody dares ask why, but it feels like a ritual.</p>`,
+            small:false,
+            large:true
+        },
+        khari: {
+            img: "khari.png",
+            text: `<h2>The Delicate Rebel</h2>
+            <p>Flaky, crisp, yet unapologetically messy.</p>
+            <p>Looks innocent but leaves destruction on the plate and floor.</p>
+            <p>Best enjoyed dipped in chai, the true test of patience.</p>
+
+            <h2>Weaknesses</h2>
+            <p>Betrays you when you least expect it—one bite, and it shatters.</p>
+            <p>Never enough pieces in one order.</p>
+            `,
+            small: false
+        },
+        sign: {
+            img: "cod.png",
+            text: `<h2>cash only </h2>
+            <p>is it because the owners still live in pre-internet age? or because of some tax
+loophole?</p>`,
+            large: false
+        },
+        nosmoking: {
+            img: "LAayer 1 (1).png",
+            text: `<h2>No Smoking</h2>
+                    <p>The only thing in the café with authority.</p>
+                   <p>People read it, acknowledge it, and then step outside for a smoke anyway.</p>
+                   <p>A symbol of resistance and obedience, all at once.</p>`,
+            small: true
+        },
+    };
+
+    if (content[item]) {
+        popupImg.src = content[item].img;
+        popupText.innerHTML = content[item].text;
+
+        // Apply small class if needed
+        if (content[item].small) {
+            popupImg.classList.add("small");
+        } else {
+            popupImg.classList.remove("small");
+        }
+
+        overlay.style.display = 'block';
+        popup.style.display = 'block';
+        setTimeout(() => popup.classList.add('show-popup'), 10);
+    }
+}
+        function closePopup() {
+            popup.classList.remove('show-popup');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                popup.style.display = 'none';
+            }, 300);
+        }
+
+        overlay.addEventListener('click', (e) => {
+            closePopup();
+            e.stopPropagation();
+        });
+
+        popup.addEventListener('click', (e) => e.stopPropagation());
+    </script>
+</body>
+</html>
